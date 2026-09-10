@@ -1,4 +1,4 @@
-import axios from 'axios'
+// import axios from 'axios'
 import axiosInstance from './axios.js'
 
 const getResturants = async () => {

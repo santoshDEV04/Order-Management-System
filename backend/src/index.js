@@ -2,6 +2,7 @@ import { app } from "./app.js";
 import './db/DBconn.js';
 import connectDB from "./db/DBconn.js";
 
+
 app.on('error', (err) => {
     console.error('Server error:', err);
 });
