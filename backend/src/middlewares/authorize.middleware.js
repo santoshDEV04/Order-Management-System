@@ -1,17 +1,17 @@
 import {ApiError} from "../utils/ApiError.js";
 
-const authorizeRoles = (...roles) => {
-    return (req, res, next) => {
-        if(!req.user) {
-            return new ApiError(401, "Not authorized");
-        }
+// const authorizeRoles = (...roles) => {
+//     return (req, res, next) => {
+//         if(!req.user) {
+//             return new ApiError(401, "Not authorized");
+//         }
 
-        if(!roles.includes(req.user.role)) {
-            return new ApiError(403, `User role ${req.user.role} is not authorized to access this resource`)
-        }
-        next();
-    }
-}
+//         if(!roles.includes(req.user.role)) {
+//             return new ApiError(403, `User role ${req.user.role} is not authorized to access this resource`)
+//         }
+//         next();
+//     }
+// }
 
 
 const checkPermission = (action) => {
@@ -35,4 +35,4 @@ const checkPermission = (action) => {
 }
 
 
-export { authorizeRoles, checkPermission };
+export { checkPermission };

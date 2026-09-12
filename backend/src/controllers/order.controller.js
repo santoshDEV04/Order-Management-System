@@ -63,10 +63,13 @@ MARK ORDER AS PAID
 export const placeOrder = asyncHandler(async (req, res) => {
     const { orderId } = req.params;
 
-    const order = await Order.findOne({
-        _id: orderId,
-        user: req.user._id
-    });
+    // ADMIN and MANAGER can approve ANY order; MEMBER can only approve their own
+    const query = { _id: orderId };
+    if (req.user.role === 'MEMBER') {
+        query.user = req.user._id;
+    }
+
+    const order = await Order.findOne(query);
 
     if (!order) {
         throw new ApiError(404, "Order not found");
@@ -79,9 +82,12 @@ export const placeOrder = asyncHandler(async (req, res) => {
     order.status = "PAID";
     await order.save();
 
+    const populated = await Order.findById(order._id)
+        .populate('user', 'name email')
+        .populate('restaurant');
+
     return res.status(200).json(
-        // ✅ Fixed: (statusCode, data, message)
-        new ApiResponse(200, order, "Order paid successfully")
+        new ApiResponse(200, populated, "Order approved and marked as PAID successfully")
     );
 });
 
@@ -91,10 +97,13 @@ CANCEL ORDER
 export const cancelOrder = asyncHandler(async (req, res) => {
     const { orderId } = req.params;
 
-    const order = await Order.findOne({
-        _id: orderId,
-        user: req.user._id
-    });
+    // ADMIN and MANAGER can cancel ANY order; MEMBER can only cancel their own
+    const query = { _id: orderId };
+    if (req.user.role === 'MEMBER') {
+        query.user = req.user._id;
+    }
+
+    const order = await Order.findOne(query);
 
     if (!order) {
         throw new ApiError(404, "Order not found");
@@ -107,9 +116,12 @@ export const cancelOrder = asyncHandler(async (req, res) => {
     order.status = "CANCELLED";
     await order.save();
 
+    const populated = await Order.findById(order._id)
+        .populate('user', 'name email')
+        .populate('restaurant');
+
     return res.status(200).json(
-        // ✅ Fixed: (statusCode, data, message)
-        new ApiResponse(200, order, "Order cancelled successfully")
+        new ApiResponse(200, populated, "Order cancelled successfully")
     );
 });
 

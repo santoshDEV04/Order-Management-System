@@ -10,12 +10,11 @@ import { ApiError } from "../utils/ApiError.js";
  * View all restaurants with menus (optimized)
  */
 export const viewResturantsAndMenu = asyncHandler(async (req, res) => {
-    const userCountry = req.user.country;
+    // countryFilter middleware sets req.countryFilter = {} for ADMIN (all countries)
+    // or { country: req.user.country } for MANAGER/MEMBER
+    const filter = { isActive: true, ...(req.countryFilter || {}) };
 
-    const resturants = await Resturant.find({
-        country: userCountry,
-        isActive: true
-    }).populate("manager", "name email");
+    const resturants = await Resturant.find(filter).populate("manager", "name email");
 
     const resturantIds = resturants.map(r => r._id);
 
@@ -179,17 +178,18 @@ export const updateResturant = asyncHandler(async (req, res) => {
  */
 export const deleteResturant = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const userCountry = req.user.country;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new ApiError(400, "Invalid restaurant ID");
     }
 
-    const resturant = await Resturant.findOne({
-        _id: id,
-        country: userCountry,
-        isActive: true
-    });
+    // ADMIN can delete any restaurant; MANAGER/MEMBER are country-restricted
+    const filter = { _id: id, isActive: true };
+    if (req.user.role !== 'ADMIN') {
+        filter.country = req.user.country;
+    }
+
+    const resturant = await Resturant.findOne(filter);
 
     if (!resturant) {
         throw new ApiError(404, "Restaurant not found or not accessible");

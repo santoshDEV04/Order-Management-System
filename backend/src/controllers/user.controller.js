@@ -21,31 +21,33 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
 }
 
 export const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, country } = req.body;
 
-    if (!name || !email || !password || !role) {
-        throw new ApiError(400, "All fields are required");
+    if (!name || !email || !password) {
+        throw new ApiError(400, "Name, email, and password are required");
     }
 
     const existingUser = await User.findOne({
-        email: email,
-    })
+        email: email.toLowerCase().trim(),
+    });
 
     if (existingUser) {
         throw new ApiError(409, "User with this email already exists");
     }
 
+    // Anyone who registers via public registration endpoint is assigned default role MEMBER
     const user = await User.create({
-        name,
-        email,
+        name: name.trim(),
+        email: email.toLowerCase().trim(),
         password,
-        role
-    })
+        role: "MEMBER",
+        country: country ? country.toUpperCase().trim() : "INDIA"
+    });
 
-    const createdUser = await User.findById(user._id).select("-password -refreshToken")
+    const createdUser = await User.findById(user._id).select("-password -refreshToken");
 
-    res.status(201).json(new ApiResponse(true, "User registered successfully", createdUser))
-})
+    res.status(201).json(new ApiResponse(201, createdUser, "User registered successfully"));
+});
 
 export const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
