@@ -6,12 +6,9 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 
-/**
- * View all restaurants with menus (optimized)
- */
+
 export const viewResturantsAndMenu = asyncHandler(async (req, res) => {
-    // countryFilter middleware sets req.countryFilter = {} for ADMIN (all countries)
-    // or { country: req.user.country } for MANAGER/MEMBER
+
     const filter = { isActive: true, ...(req.countryFilter || {}) };
 
     const resturants = await Resturant.find(filter).populate("manager", "name email");
@@ -40,9 +37,6 @@ export const viewResturantsAndMenu = asyncHandler(async (req, res) => {
 });
 
 
-/**
- * Get single restaurant by ID with its menu
- */
 export const getResturantById = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
@@ -50,7 +44,7 @@ export const getResturantById = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid restaurant ID");
     }
 
-    // ✅ Fixed: removed country filter so any authenticated user can fetch by ID
+
     const resturant = await Resturant.findOne({
         _id: id,
         isActive: true
@@ -75,9 +69,7 @@ export const getResturantById = asyncHandler(async (req, res) => {
 });
 
 
-/**
- * Create restaurant
- */
+
 export const createResturant = asyncHandler(async (req, res) => {
     const { name, country, address, manager } = req.body;
 
@@ -116,9 +108,7 @@ export const createResturant = asyncHandler(async (req, res) => {
 });
 
 
-/**
- * Update restaurant (secure)
- */
+
 export const updateResturant = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const userCountry = req.user.country;
@@ -183,7 +173,7 @@ export const deleteResturant = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid restaurant ID");
     }
 
-    // ADMIN can delete any restaurant; MANAGER/MEMBER are country-restricted
+
     const filter = { _id: id, isActive: true };
     if (req.user.role !== 'ADMIN') {
         filter.country = req.user.country;

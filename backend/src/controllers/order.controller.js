@@ -57,13 +57,10 @@ export const createOrder = asyncHandler(async (req, res) => {
     }
 });
 
-/*
-MARK ORDER AS PAID
-*/
+
 export const placeOrder = asyncHandler(async (req, res) => {
     const { orderId } = req.params;
 
-    // ADMIN and MANAGER can approve ANY order; MEMBER can only approve their own
     const query = { _id: orderId };
     if (req.user.role === 'MEMBER') {
         query.user = req.user._id;

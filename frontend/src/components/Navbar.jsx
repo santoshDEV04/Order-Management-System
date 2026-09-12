@@ -97,7 +97,7 @@ export const Navbar = () => {
   return (
     <header className="sticky top-0 z-40 w-full bg-[var(--bg-panel)] border-b border-[var(--border-subtle)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-        
+
         {/* Brand */}
         <div
           onClick={() => navigate(getHomeRoute())}
@@ -107,7 +107,7 @@ export const Navbar = () => {
             <Shield className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-bold text-sm text-[var(--text-main)]">RBAC Food Delivery</span>
+            <span className="font-bold text-sm text-[var(--text-main)]">Resturant Order and Management System</span>
             <span className="text-[10px] text-[var(--text-muted)] font-mono ml-2 hidden sm:inline">
               Backend Demonstration
             </span>
